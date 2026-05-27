@@ -305,18 +305,51 @@ class StatsService:
     def overview(self, current_user: Dict[str, Any]) -> Dict[str, Any]:
         borrow_service = BorrowService()
         borrow_service._sync_overdue_status()
+
+        # 这里改成所有角色都可以看到的基础统计数据
+        book_total = db_manager.fetch_one(
+            "SELECT COALESCE(SUM(total_count), 0) AS n FROM books"
+        )["n"]
+
+        reader_total = db_manager.fetch_one(
+            "SELECT COUNT(*) AS n FROM users WHERE role='reader'"
+        )["n"]
+
         if current_user["role"] == "reader":
             uid = current_user["id"]
-            borrowed = db_manager.fetch_one("SELECT COUNT(*) AS n FROM borrow_records WHERE reader_id = ? AND status = 'borrowed'", (uid,))["n"]
-            overdue = db_manager.fetch_one("SELECT COUNT(*) AS n FROM borrow_records WHERE reader_id = ? AND status = 'overdue'", (uid,))["n"]
-            returned = db_manager.fetch_one("SELECT COUNT(*) AS n FROM borrow_records WHERE reader_id = ? AND status = 'returned'", (uid,))["n"]
-            return {"book_total": None, "reader_total": None, "borrowed": borrowed, "overdue": overdue, "returned": returned}
+            borrowed = db_manager.fetch_one(
+                "SELECT COUNT(*) AS n FROM borrow_records WHERE reader_id = ? AND status = 'borrowed'",
+                (uid,)
+            )["n"]
+            overdue = db_manager.fetch_one(
+                "SELECT COUNT(*) AS n FROM borrow_records WHERE reader_id = ? AND status = 'overdue'",
+                (uid,)
+            )["n"]
+            returned = db_manager.fetch_one(
+                "SELECT COUNT(*) AS n FROM borrow_records WHERE reader_id = ? AND status = 'returned'",
+                (uid,)
+            )["n"]
+
+            return {
+                "book_total": book_total,
+                "reader_total": reader_total,
+                "borrowed": borrowed,
+                "overdue": overdue,
+                "returned": returned,
+            }
+
         return {
-            "book_total": db_manager.fetch_one("SELECT COUNT(*) AS n FROM books")["n"],
-            "reader_total": db_manager.fetch_one("SELECT COUNT(*) AS n FROM users WHERE role='reader'")["n"],
-            "borrowed": db_manager.fetch_one("SELECT COUNT(*) AS n FROM borrow_records WHERE status='borrowed'")["n"],
-            "overdue": db_manager.fetch_one("SELECT COUNT(*) AS n FROM borrow_records WHERE status='overdue'")["n"],
-            "returned": db_manager.fetch_one("SELECT COUNT(*) AS n FROM borrow_records WHERE status='returned'")["n"],
+            "book_total": book_total,
+            "reader_total": reader_total,
+            "borrowed": db_manager.fetch_one(
+                "SELECT COUNT(*) AS n FROM borrow_records WHERE status='borrowed'"
+            )["n"],
+            "overdue": db_manager.fetch_one(
+                "SELECT COUNT(*) AS n FROM borrow_records WHERE status='overdue'"
+            )["n"],
+            "returned": db_manager.fetch_one(
+                "SELECT COUNT(*) AS n FROM borrow_records WHERE status='returned'"
+            )["n"],
         }
 
     def category_distribution(self) -> List[Dict[str, Any]]:
