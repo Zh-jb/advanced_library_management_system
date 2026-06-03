@@ -1,369 +1,738 @@
+/* ========== 完全恢复“标记的那一版” Serif 风格，并强制主要按钮可见 ========== */
 :root {
-  /* 莫兰蒂灰蓝色系 */
-  --bg-color: #e4e9f2;
-  --glass-bg: rgba(255, 255, 255, 0.55);
-  --glass-border: rgba(255, 255, 255, 0.8);
-  --text-main: #475569;
-  --text-muted: #8292a6;
-  --primary: #6b8ea5;      /* 莫兰蒂蓝 */
-  --primary-dark: #56788e;
-  --danger: #cca3a3;       /* 莫兰蒂红粉 */
-  --success: #9ebba1;      /* 莫兰蒂绿 */
-  --warning: #d4b58e;      /* 莫兰蒂黄 */
-
-  /* 餐盒布局与毛玻璃参数 */
-  --radius-bento: 24px;
-  --shadow-glass: 0 8px 32px rgba(107, 142, 165, 0.08);
-  --gap-bento: 20px;
+  --background: #FAFAF8;
+  --foreground: #1A1A1A;
+  --muted: #F5F3F0;
+  --muted-foreground: #6B6B6B;
+  --accent: #B8860B;
+  --accent-secondary: #D4A84B;
+  --accent-foreground: #FFFFFF;
+  --border: #E8E4DF;
+  --card: #FFFFFF;
+  --shadow-sm: 0 1px 2px rgba(26,26,26,0.04);
+  --shadow-md: 0 4px 12px rgba(26,26,26,0.06);
+  --radius: 8px;
+  --control-height: 44px;
 }
 
-* { box-sizing: border-box; }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
 body {
-  margin: 0;
-  font-family: Inter, "Microsoft YaHei", "PingFang SC", sans-serif;
-  color: var(--text-main);
-  background-color: var(--bg-color);
-  /* 柔和的背景渐变，用于突显毛玻璃效果 */
-  background-image:
-    radial-gradient(at 10% 10%, rgba(162, 186, 203, 0.4) 0px, transparent 40%),
-    radial-gradient(at 90% 90%, rgba(212, 181, 142, 0.3) 0px, transparent 40%);
-  background-attachment: fixed;
-  min-height: 100vh;
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Source Sans 3', system-ui, sans-serif;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+  position: relative;
 }
-
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  opacity: 0.03;
+  z-index: 0;
+}
 .hidden { display: none !important; }
 
-/* --- 登录页 --- */
+/* 登录页 */
 .login-page {
   min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--background);
+  padding: 20px;
 }
 .login-card {
-  width: min(420px, 100%);
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 40px;
-  border-radius: var(--radius-bento);
-  box-shadow: var(--shadow-glass);
-  border: 1px solid var(--glass-border);
-  text-align: center;
+  max-width: 460px;
+  width: 100%;
+  box-shadow: var(--shadow-sm);
+}
+.login-card h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.2rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-bottom: 0.5rem;
+}
+.login-card p {
+  color: var(--muted-foreground);
+  margin-bottom: 1.8rem;
 }
 .brand-mark {
-  width: 56px; height: 56px;
-  margin: 0 auto 20px;
-  display: grid; place-items: center;
-  border-radius: 18px;
-  background: var(--primary);
-  color: white; font-size: 28px; font-weight: 800;
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
 }
-.brand-mark.small { width: 40px; height: 40px; border-radius: 12px; font-size: 20px; margin: 0; }
-.login-card h1 { margin: 0 0 10px; font-size: 24px; color: #334155; }
-.login-card p { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
-.demo-account { margin-top: 20px; font-size: 13px; color: var(--text-muted); }
+.demo-account {
+  margin-top: 2rem;
+  font-size: 0.8rem;
+  color: var(--muted-foreground);
+  border-top: 1px solid var(--border);
+  padding-top: 1.2rem;
+}
 
-/* --- 主体框架 (Bento 结构) --- */
-.app-shell { display: flex; gap: var(--gap-bento); padding: var(--gap-bento); min-height: 100vh; }
+/* 主布局 */
+.app-shell {
+  display: flex;
+  min-height: 100vh;
+  position: relative;
+  z-index: 1;
+}
 
+/* 侧边栏 */
 .sidebar {
   width: 260px;
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-bento);
+  background: var(--card);
+  border-right: 1px solid var(--border);
   padding: 24px 16px;
-  box-shadow: var(--shadow-glass);
-  display: flex; flex-direction: column; gap: 8px;
-  position: sticky; top: var(--gap-bento); height: calc(100vh - var(--gap-bento) * 2);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  transition: transform 0.2s ease;
 }
-.side-brand { display: flex; align-items: center; gap: 12px; padding: 0 8px 20px; color: #334155;}
-.side-brand strong { font-size: 18px; }
-.side-brand span { display: block; color: var(--text-muted); font-size: 12px; }
-
+.side-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-bottom: 20px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+.brand-mark.small {
+  font-size: 1.8rem;
+}
+.side-brand strong {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+.side-brand span {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted-foreground);
+}
 .nav {
-  display: block; width: 100%;
-  color: var(--text-main); background: transparent; border: 0;
-  padding: 14px 18px; text-align: left;
-  border-radius: 16px; cursor: pointer; font-size: 15px; font-weight: 500;
-  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  padding: 10px 14px;
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: var(--radius);
 }
-.nav:hover { background: rgba(255, 255, 255, 0.4); }
-.nav.active { background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.03); color: var(--primary-dark); font-weight: 600; }
+.nav:hover {
+  background: var(--muted);
+  color: var(--foreground);
+}
+.nav.active {
+  background: var(--muted);
+  color: var(--accent);
+  border-left: 3px solid var(--accent);
+}
+.nav .nav-count {
+  background: transparent;
+  font-size: 0.7rem;
+  font-family: 'IBM Plex Mono', monospace;
+  letter-spacing: 0.05em;
+}
 
-.workspace { flex: 1; display: flex; flex-direction: column; gap: var(--gap-bento); min-width: 0; }
+/* 工作区 */
+.workspace {
+  flex: 1;
+  padding: 24px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
 
-/* --- 顶部导航 --- */
+/* 顶部栏 */
 .topbar {
-  display: flex; align-items: center; justify-content: space-between;
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-bento);
-  padding: 20px 28px;
-  box-shadow: var(--shadow-glass);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
 }
-.topbar h2 { margin: 0 0 4px; font-size: 22px; color: #334155; }
-.topbar p { margin: 0; color: var(--text-muted); font-size: 13px; }
-.user-box { display: flex; gap: 16px; align-items: center; font-size: 14px; font-weight: 500; }
+.title-section h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.8rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+.title-section p {
+  color: var(--muted-foreground);
+  font-size: 0.85rem;
+}
+.user-box {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  background: var(--muted);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--accent);
+}
+.user-info {
+  font-weight: 500;
+}
+.user-role {
+  font-size: 0.7rem;
+  color: var(--muted-foreground);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
 
-.view { display: none; }
-.active-view { display: grid; gap: var(--gap-bento); } /* 餐盒布局核心 */
-
-/* --- 毛玻璃面板 (Bento 卡片) --- */
+/* 卡片 */
 .panel {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-bento);
-  padding: 28px;
-  box-shadow: var(--shadow-glass);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+  box-shadow: var(--shadow-sm);
+  transition: all 0.2s;
 }
-.panel-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
-.panel-title h3 { margin: 0; font-size: 18px; color: #334155; }
-.panel-title span { color: var(--text-muted); font-size: 13px; }
+.panel:hover {
+  box-shadow: var(--shadow-md);
+}
+.panel-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 12px;
+  margin-bottom: 24px;
+}
+.panel-title h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+.panel-title span {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted-foreground);
+}
 
-/* --- 网格系统 --- */
-.metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--gap-bento); }
+/* 视图切换 */
+.view {
+  display: none;
+}
+.view.active-view {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* 指标卡片 */
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+}
 .metric-card {
-  background: rgba(255, 255, 255, 0.4);
-  border: 1px solid var(--glass-border);
-  border-radius: 20px; padding: 20px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: all 0.2s;
 }
-.metric-card span { color: var(--text-muted); font-size: 13px; font-weight: 500; }
-.metric-card strong { display: block; font-size: 32px; margin-top: 10px; color: #334155; }
+.metric-card:hover {
+  box-shadow: var(--shadow-md);
+}
+.metric-card span {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted-foreground);
+}
+.metric-card strong {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--accent);
+  display: block;
+  margin-top: 8px;
+}
 
-/* --- 图表网格容器 --- */
+/* 图表 */
 .chart-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: var(--gap-bento);
-  width: 100%;
-  min-width: 0; /* 防止整体容器被内部子元素撑破 */
+  gap: 24px;
 }
-
-/* 关键修复：允许 Panel 在 Grid 布局中向内收缩 */
-.chart-grid .panel {
-  min-width: 0; /* 这是解决溢出问题的核心，打破 Grid 默认的最小内容宽度限制 */
-  width: 100%;
-  overflow: hidden; /* 隐藏任何可能越界的绘制边缘 */
+.canvas-wrapper {
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
 }
-
-/* --- Canvas 强制响应式缩放 --- */
 canvas {
-  width: 100% !important;     /* 强制宽度跟随父元素 (.panel) */
-  max-width: 100%;
-  height: auto !important;    /* 高度按比例自动缩放，防止变形 */
-  max-height: 220px;          /* 封顶高度，对齐你原始代码的 220px 预期 */
-  display: block;             /* 消除 Canvas 底部的幽灵空白间距 */
-  margin: 0 auto;
+  width: 100%;
+  height: auto;
+  display: block;
 }
 
-/* --- 表单与控件 --- */
-.toolbar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
-input, select {
-  width: 100%; border: 1px solid rgba(255, 255, 255, 0.6);
-  border-radius: 14px; padding: 12px 16px; outline: none;
-  background: rgba(255, 255, 255, 0.7); color: var(--text-main);
+/* ========== 输入框/下拉框：恢复“标记的那一版”样式，只统一高度 ========== */
+input:not([type="checkbox"]):not([type="radio"]),
+select,
+textarea {
+  width: 100%;
+  height: var(--control-height);
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--card);
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 0.9rem;
   transition: all 0.2s;
+  box-sizing: border-box;
 }
-input:focus, select:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(107, 142, 165, 0.15); }
-.toolbar input { max-width: 320px; }
-.toolbar select { max-width: 160px; }
-
-button {
-  border: 0; border-radius: 14px; padding: 12px 20px;
-  cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s;
+textarea {
+  height: auto;
+  min-height: var(--control-height);
+  padding: 10px 12px;
 }
-button.primary { background: var(--primary); color: white; }
-button.primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
-button.ghost { background: rgba(255, 255, 255, 0.6); color: var(--text-main); border: 1px solid var(--glass-border); }
-button.ghost:hover { background: white; }
-button.danger { background: var(--danger); color: white; }
-button.full { width: 100%; }
-
-.form-grid { display: grid; gap: 16px; }
-.grid-4 { grid-template-columns: repeat(4, 1fr); align-items: end; }
-.form-grid label { display: grid; gap: 8px; font-size: 13px; font-weight: 500; }
-.span-2 { grid-column: span 2; }
-.span-4 { grid-column: span 4; }
-
-/* --- 表格设计 --- */
-.table-wrap { width: 100%; overflow-x: auto; border-radius: 16px; }
-table { width: 100%; border-collapse: collapse; min-width: 860px; }
-th, td { padding: 14px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.5); text-align: left; }
-th { color: var(--text-muted); font-size: 13px; font-weight: 600; background: rgba(255, 255, 255, 0.3); }
-td { font-size: 14px; }
-tr:hover td { background: rgba(255, 255, 255, 0.4); }
-
-/* --- 徽章 --- */
-.badge { display: inline-block; padding: 6px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; }
-.badge.borrowed { background: rgba(107, 142, 165, 0.2); color: var(--primary-dark); }
-.badge.returned { background: rgba(158, 187, 161, 0.2); color: var(--success); }
-.badge.overdue { background: rgba(204, 163, 163, 0.2); color: var(--danger); }
-
-.row-actions { display: flex; gap: 8px; }
-.row-actions button { padding: 6px 12px; font-size: 12px; border-radius: 10px; }
-
-/* --- 列表与杂项 --- */
-.pager { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 20px; font-size: 13px; }
-.top-list { display: grid; gap: 12px; }
-.top-item {
-  display: grid; grid-template-columns: 44px 1fr auto; gap: 16px; align-items: center;
-  padding: 12px 16px; border-radius: 18px; background: rgba(255, 255, 255, 0.4);
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%231A1A1A' stroke-width='2'><polyline points='6 9 12 15 18 9'></polyline></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 14px;
 }
-.top-item .rank { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 12px; background: var(--primary); color: white; font-weight: 700; }
-.reminder-msg { padding: 14px 18px; background: rgba(204, 163, 163, 0.15); color: #9c6060; border-radius: 16px; margin-bottom: 12px;}
-
-.toast {
-  position: fixed; right: 24px; top: 24px; z-index: 50;
-  background: var(--glass-bg); backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border); color: #334155; font-weight: 500;
-  padding: 14px 20px; border-radius: 16px; box-shadow: var(--shadow-glass);
-  opacity: 0; transform: translateY(-10px); transition: .3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-.toast.show { opacity: 1; transform: translateY(0); }
-
-/* --- 响应式 --- */
-@media (max-width: 960px) {
-  .app-shell { flex-direction: column; padding: 12px; }
-  .sidebar { width: 100%; height: auto; position: relative; top: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; }
-  .side-brand { grid-column: 1 / -1; padding-bottom: 8px; }
-  .chart-grid, .grid-4 { grid-template-columns: 1fr; }
-  .span-2, .span-4 { grid-column: auto; }
-  .topbar { flex-direction: column; align-items: flex-start; gap: 16px; }
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(184,134,11,0.1);
 }
 
-
-/* ==========================================================================
-   【专项优化】右上角提示框（Toast）- 升级为高亮毛玻璃色系，文字极清晰
-   ========================================================================== */
-.toast {
-  position: fixed;
-  right: 24px;
-  top: 24px;
-  z-index: 100;
-  min-width: 320px;
-  max-width: 420px;
-  padding: 16px 20px;
-  border-radius: 16px;
-  box-shadow: 0 12px 36px rgba(107, 142, 165, 0.12);
-  opacity: 0;
-  transform: translateY(-12px);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  pointer-events: none;
-  font-size: 14px;
-  font-weight: 700; /* 加粗字体，确保一目了然 */
+/* 工具栏对齐 */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 24px;
+}
+.toolbar .input,
+.toolbar select,
+.toolbar .btn {
+  width: auto;
+  min-width: 100px;
+  height: var(--control-height);
+  box-sizing: border-box;
 }
 
-.toast.show {
-  opacity: 1;
-  transform: translateY(0);
+/* ========== 按钮样式（完全恢复“标记的那一版”的原始视觉） ========== */
+.btn,
+button:not(.nav) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  padding: 0 20px;
+  height: var(--control-height);
+  font-family: 'Source Sans 3', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: transparent;
+  box-sizing: border-box;
 }
 
-/* 成功提示（如：借书、还书成功）- 明亮清爽绿 */
-.toast.success {
-  background: rgba(240, 253, 244, 0.96) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid #bbf7d0 !important;
-  border-left: 5px solid #16a34a !important;
-  color: #14532d !important; /* 极高对比度深绿字 */
+/* 主按钮（金色背景，白色文字） */
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  border-color: var(--accent);
+}
+.btn-primary:hover {
+  background: var(--accent-secondary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
-/* 错误提示 - 明亮珊瑚红 */
-.toast.error {
-  background: rgba(254, 242, 242, 0.96) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid #fecaca !important;
-  border-left: 5px solid #dc2626 !important;
-  color: #7f1d1d !important; /* 极高对比度深红字 */
+/* 次要按钮（浅灰背景，深色边框） */
+.btn-outline {
+  border: 1px solid var(--border);
+  background: var(--muted);
+  color: var(--foreground);
+}
+.btn-outline:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--card);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
-/* 普通信息提示 - 明亮天空蓝 */
-.toast.info {
-  background: rgba(240, 249, 255, 0.96) !important;
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid #bae6fd !important;
-  border-left: 5px solid #0284c7 !important;
-  color: #0c4a6e !important; /* 极高对比度深蓝字 */
+/* 小按钮（表格内操作） */
+.btn-outline-sm {
+  border: 1px solid var(--border);
+  background: var(--muted);
+  color: var(--foreground);
+  padding: 0 12px;
+  height: 34px;
+  font-size: 0.75rem;
+}
+.btn-outline-sm:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--card);
+  transform: translateY(-2px);
 }
 
+.full {
+  width: 100%;
+}
+.row-actions button {
+  margin: 0 2px;
+}
 
-/* ==========================================================================
-   【专项优化】借阅、归还状态标签（Badge）- 换用高亮高对比色系
-   ========================================================================== */
+/* 强制保证“查询、保存图书、保存读者、确认借书、刷新逾期列表”这几个主要按钮始终可见（金色） */
+#bookSearchBtn,
+#bookForm .btn-primary,
+#readerForm .btn-primary,
+#borrowForm .btn-primary,
+#refreshOverdueBtn,
+#generateRemindersBtn {
+  background: #B8860B !important;
+  color: white !important;
+  border-color: #B8860B !important;
+}
+#bookSearchBtn:hover,
+#bookForm .btn-primary:hover,
+#readerForm .btn-primary:hover,
+#borrowForm .btn-primary:hover,
+#refreshOverdueBtn:hover,
+#generateRemindersBtn:hover {
+  background: #9A7308 !important;
+  transform: translateY(-2px);
+}
+
+/* 表单网格 */
+.form-grid {
+  display: grid;
+  gap: 20px;
+}
+.grid-4 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+.span-2 {
+  grid-column: span 2;
+}
+.span-4 {
+  grid-column: span 4;
+}
+.form-actions {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+.form-actions .btn {
+  min-width: 120px;
+}
+label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--foreground);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 表格 */
+.table-wrap {
+  overflow-x: auto;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+th,
+td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+th {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted-foreground);
+  font-weight: 600;
+  background: var(--muted);
+}
+td {
+  font-size: 0.9rem;
+}
+tr:hover td {
+  background: rgba(245, 243, 240, 0.5);
+}
+
+/* 徽章 */
 .badge {
   display: inline-block;
-  padding: 6px 14px;
-  border-radius: 12px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-align: center;
+  padding: 2px 10px;
+  border-radius: 20px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
-
-/* 借阅中 标签 - 鲜明醒目的蔚蓝色 */
 .badge.borrowed {
-  background: #e0f2fe !important;
-  color: #0369a1 !important;
-  border: 1px solid #bae6fd !important;
+  background: rgba(184, 134, 11, 0.15);
+  color: var(--accent);
 }
-
-/* 已归还 标签 - 充满生机的翡翠绿 */
 .badge.returned {
-  background: #dcfce7 !important;
-  color: #15803d !important;
-  border: 1px solid #bbf7d0 !important;
+  background: #E8E4DF;
+  color: #5A5A5A;
 }
-
-/* 已逾期 标签 - 警示性的亮红色 */
 .badge.overdue {
-  background: #fee2e2 !important;
-  color: #b91c1c !important;
-  border: 1px solid #fecaca !important;
+  background: #FCE4E4;
+  color: #B00020;
 }
 
-
-/* ==========================================================================
-   【专项优化】表格内“借阅”与“归还”动作按钮亮化与动态质感
-   ========================================================================== */
-.row-actions button, table button {
-  padding: 6px 14px !important;
-  font-size: 13px !important;
-  font-weight: 700 !important;
-  border-radius: 10px !important;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+/* 分页 */
+.pager {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
 }
 
-/* “借阅”点击按钮 - 亮蓝风格 */
-.row-actions button.ghost:first-child {
-  background: #eff6ff;
-  color: #2563eb;
-  border: 1px solid #bfdbfe;
+/* 热门图书列表 */
+.top-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
-.row-actions button.ghost:first-child:hover {
-  background: #2563eb;
+.top-item {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 12px 16px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all 0.2s;
+}
+.top-item:hover {
+  border-color: var(--accent);
+}
+.rank {
+  width: 36px;
+  height: 36px;
+  background: var(--muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 1.2rem;
+  border-radius: 50%;
+}
+.borrow-count {
+  font-weight: 700;
+  color: var(--accent);
+  margin-left: auto;
+}
+
+/* 逾期提醒 */
+.reminder-msg {
+  padding: 12px 20px;
+  background: #FFF8E7;
+  border-left: 4px solid var(--accent);
+  margin-bottom: 12px;
+  font-size: 0.85rem;
+}
+.reminder-box {
+  margin-bottom: 24px;
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--foreground);
+  color: var(--background);
+  padding: 12px 24px;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  z-index: 1000;
+  opacity: 0;
+  transform: translateX(20px);
+  transition: all 0.2s;
+}
+.toast.show {
+  opacity: 1;
+  transform: translateX(0);
+}
+.toast.success {
+  background: var(--accent);
   color: white;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+}
+.toast.error {
+  background: #B00020;
+  color: white;
+}
+.toast.info {
+  background: var(--accent-secondary);
 }
 
-/* “归还”点击按钮 - 亮绿风格 */
-table button.primary {
-  background: #f0fdf4;
-  color: #16a34a;
-  border: 1px solid #bbf7d0;
+/* 响应式 */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 12px;
+  }
+  .side-brand {
+    display: none;
+  }
+  .nav {
+    width: auto;
+  }
+  .workspace {
+    padding: 16px;
+    margin-top: 0;
+  }
+  .grid-4 {
+    grid-template-columns: 1fr;
+  }
+  .chart-grid {
+    grid-template-columns: 1fr;
+  }
+  .topbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .toolbar .input,
+  .toolbar select,
+  .toolbar .btn {
+    width: 100%;
+  }
 }
-table button.primary:hover {
-  background: #16a34a;
-  color: white;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.15);
+/* ========== 1. 强制所有主要按钮显示为金色 ========== */
+#bookSearchBtn,
+#readerSearchBtn,
+#recordSearchBtn,
+#bookForm .btn-primary,
+#readerForm .btn-primary,
+#borrowForm .btn-primary,
+#refreshOverdueBtn,
+#generateRemindersBtn {
+  background: #B8860B !important;
+  color: white !important;
+  border-color: #B8860B !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* ========== 2. 修复表格“操作”列垂直居中 ========== */
+th:last-child,
+td:last-child {
+  vertical-align: middle !important;
+}
+
+.row-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  line-height: 1;
+  margin: 0;
+  padding: 0;
+}
+
+/* 确保操作按钮高度一致，不影响对齐 */
+.row-actions .btn-outline-sm {
+  margin: 0;
+  padding: 0 12px;
+  height: 32px;
+  line-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 表头文字使用相同的行高，确保垂直居中 */
+th:last-child {
+  line-height: 32px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+/* 强制登录按钮始终可见 */
+.login-card .btn-primary,
+#loginForm .btn-primary {
+  background: #B8860B !important;
+  color: white !important;
+  border: 1px solid #B8860B !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+.login-card .btn-primary:hover {
+  background: #9A7308 !important;
+  transform: translateY(-2px);
 }

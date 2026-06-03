@@ -2,169 +2,77 @@
 <html lang="zh-CN">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>智慧图书管理系统</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>智慧图书管理系统 · 书香典雅</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&family=Source+Sans+3:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
   <div id="toast" class="toast"></div>
 
+  <!-- 登录页 -->
   <main id="loginPage" class="login-page">
-    <section class="login-card">
-      <div class="brand-mark">L</div>
+    <div class="login-card">
+      <div class="brand-mark"></div>
       <h1>智慧图书管理系统</h1>
-      <p>支持图书增删查改、借还记录、读者管理、逾期提醒、管理员权限与数据可视化。</p>
-      <form id="loginForm" class="form-grid">
-        <label>用户名<input id="loginUsername" autocomplete="username" placeholder="admin" required /></label>
-        <label>密码<input id="loginPassword" type="password" autocomplete="current-password" placeholder="admin123" required /></label>
-        <button class="primary full" type="submit">登录系统</button>
+      <p>增删查改 · 借还记录 · 逾期提醒 · 可视化统计</p>
+      <form id="loginForm">
+        <label>用户名 <input id="loginUsername" autocomplete="username" placeholder="admin" required /></label>
+        <label>密码 <input id="loginPassword" type="password" autocomplete="current-password" placeholder="admin123" required /></label>
+        <button class="btn btn-primary full" type="submit">登录系统</button>
       </form>
       <div class="demo-account">
-        <strong>演示账号：</strong>管理员 admin / admin123；读者 reader / reader123
+        <strong>演示账号：</strong>管理员 admin / admin123 &nbsp;&nbsp; 读者 reader / reader123
       </div>
-    </section>
+    </div>
   </main>
 
   <div id="appShell" class="app-shell hidden">
-    <aside class="sidebar">
+    <aside id="sidebar" class="sidebar">
       <div class="side-brand">
-        <div class="brand-mark small">L</div>
-        <div>
-          <strong>Library</strong>
-          <span>Management</span>
-        </div>
+        <div class="brand-mark small"></div>
+        <div><strong>智慧图书馆</strong><span>Management</span></div>
       </div>
-      <button data-view="dashboard" class="nav active">数据总览</button>
-      <button data-view="books" class="nav">图书管理</button>
-      <button data-view="readers" class="nav admin-only">读者管理</button>
-      <button data-view="records" class="nav">借还记录</button>
-      <button data-view="overdue" class="nav">逾期提醒</button>
+      <button data-view="dashboard" class="nav active"><span>数据总览</span><span class="nav-count" id="dashboardCount">0</span></button>
+      <button data-view="books" class="nav"><span>图书管理</span><span class="nav-count" id="booksCount">0</span></button>
+      <button data-view="readers" class="nav admin-only"><span>读者管理</span><span class="nav-count" id="readersCount">0</span></button>
+      <button data-view="records" class="nav"><span>借还记录</span><span class="nav-count" id="recordsCount">0</span></button>
+      <button data-view="overdue" class="nav"><span>逾期提醒</span><span class="nav-count" id="overdueCount">0</span></button>
     </aside>
-
     <section class="workspace">
-      <header class="topbar">
-        <div>
-          <h2 id="pageTitle">数据总览</h2>
-          <p id="pageSubtitle">多维度统计图表，辅助管理员了解图书馆运行情况。</p>
-        </div>
-        <div class="user-box">
-          <span id="currentUser"></span>
-          <button id="logoutBtn" class="ghost">退出</button>
-        </div>
-      </header>
+      <div class="topbar">
+        <div class="title-section"><h2 id="pageTitle">数据总览</h2><p id="pageSubtitle">多维度统计图表，借阅趋势一目了然</p></div>
+        <div class="user-box"><div class="user-avatar" id="userAvatar">U</div><div class="user-info"><span id="currentUser"></span><div class="user-role" id="userRole"></div></div><button id="logoutBtn" class="btn btn-outline">退出</button></div>
+      </div>
 
-      <section id="dashboard" class="view active-view">
+      <div id="dashboard" class="view active-view">
         <div id="metricGrid" class="metric-grid"></div>
         <div class="chart-grid">
-          <article class="panel">
-            <div class="panel-title"><h3>馆藏分类分布</h3><span>大数据可视化</span></div>
-            <canvas id="categoryChart" height="220"></canvas>
-          </article>
-          <article class="panel">
-            <div class="panel-title"><h3>近 14 天借阅趋势</h3><span>业务趋势</span></div>
-            <canvas id="trendChart" height="220"></canvas>
-          </article>
+          <div class="panel chart-panel"><div class="panel-title"><h3>馆藏分类分布</h3><span>按图书类别统计</span></div><div class="canvas-wrapper"><canvas id="categoryChart" width="500" height="220" style="width:100%; height:auto"></canvas></div></div>
+          <div class="panel chart-panel"><div class="panel-title"><h3>近 14 天借阅趋势</h3><span>业务动态</span></div><div class="canvas-wrapper"><canvas id="trendChart" width="500" height="220" style="width:100%; height:auto"></canvas></div></div>
         </div>
-        <article class="panel">
-          <div class="panel-title"><h3>热门图书 Top10</h3><span>按借阅次数排序</span></div>
-          <div id="topBooks" class="top-list"></div>
-        </article>
-      </section>
+        <div class="panel"><div class="panel-title"><h3>热门图书 Top10</h3><span>按借阅次数排序</span></div><div id="topBooks" class="top-list"></div></div>
+      </div>
 
-      <section id="books" class="view">
-        <article class="panel">
-          <div class="panel-title"><h3>图书检索</h3><span>支持标题 / 作者 / ISBN / 出版社模糊查询</span></div>
-          <div class="toolbar">
-            <input id="bookSearch" placeholder="输入关键词搜索图书" />
-            <select id="categoryFilter"><option value="">全部分类</option></select>
-            <button id="bookSearchBtn" class="primary">查询</button>
-            <button id="exportBooksBtn" class="ghost">导出 CSV</button>
-          </div>
-        </article>
+      <div id="books" class="view">
+        <div class="panel"><div class="panel-title"><h3>图书检索</h3><span>支持标题/作者/ISBN/出版社</span></div><div class="toolbar"><input type="text" id="bookSearch" placeholder="关键词" class="input" /><select id="categoryFilter" class="input"></select><button id="bookSearchBtn" class="btn btn-primary">查询</button><button id="exportBooksBtn" class="btn btn-outline">导出 CSV</button></div></div>
+        <div class="panel admin-only"><div class="panel-title"><h3 id="bookFormTitle">新增图书</h3><span>所有字段均受后端校验</span></div><form id="bookForm" class="form-grid grid-4"><input type="hidden" id="bookId" /><label>ISBN <input id="bookIsbn" required /></label><label>书名 <input id="bookTitle" required /></label><label>作者 <input id="bookAuthor" required /></label><label>出版社 <input id="bookPublisher" /></label><label>分类 <input id="bookCategory" required /></label><label>馆藏总数 <input id="bookTotal" type="number" min="0" required /></label><label>可借数量 <input id="bookAvailable" type="number" min="0" /></label><label>书架位置 <input id="bookShelf" /></label><label class="span-4">简介 <input id="bookDescription" /></label><div class="form-actions"><button class="btn btn-primary" type="submit">保存图书</button><button id="resetBookForm" class="btn btn-outline" type="button">清空</button></div></form></div>
+        <div class="panel"><div class="panel-title"><h3>图书列表</h3><span id="bookTotalText"></span></div><div class="table-wrap"><table id="bookTable"></table></div><div class="pager"><button id="bookPrev" class="btn btn-outline-sm">上一页</button><span id="bookPageText"></span><button id="bookNext" class="btn btn-outline-sm">下一页</button></div></div>
+      </div>
 
-        <article class="panel admin-only">
-          <div class="panel-title"><h3 id="bookFormTitle">新增图书</h3><span>输入校验已在前后端同时实现</span></div>
-          <form id="bookForm" class="form-grid grid-4">
-            <input type="hidden" id="bookId" />
-            <label>ISBN<input id="bookIsbn" required /></label>
-            <label>书名<input id="bookTitle" required /></label>
-            <label>作者<input id="bookAuthor" required /></label>
-            <label>出版社<input id="bookPublisher" /></label>
-            <label>分类<input id="bookCategory" required /></label>
-            <label>馆藏总数<input id="bookTotal" type="number" min="0" required /></label>
-            <label>可借数量<input id="bookAvailable" type="number" min="0" /></label>
-            <label>书架位置<input id="bookShelf" /></label>
-            <label class="span-4">简介<input id="bookDescription" /></label>
-            <button class="primary" type="submit">保存图书</button>
-            <button id="resetBookForm" class="ghost" type="button">清空</button>
-          </form>
-        </article>
+      <div id="readers" class="view">
+        <div class="panel"><div class="panel-title"><h3>读者信息管理</h3><span>仅管理员可见</span></div><div class="toolbar"><input id="readerSearch" placeholder="姓名/用户名/手机/邮箱" class="input" /><button id="readerSearchBtn" class="btn btn-primary">查询</button></div><form id="readerForm" class="form-grid grid-4"><input type="hidden" id="readerId" /><label>用户名 <input id="readerUsername" required /></label><label>密码 <input id="readerPassword" type="password" placeholder="新增必填，编辑留空" /></label><label>姓名 <input id="readerFullName" required /></label><label>状态 <select id="readerStatus"><option value="active">正常</option><option value="frozen">冻结</option></select></label><label>手机 <input id="readerPhone" /></label><label>邮箱 <input id="readerEmail" /></label><label class="span-2">院系 <input id="readerDepartment" /></label><div class="form-actions"><button class="btn btn-primary" type="submit">保存读者</button><button id="resetReaderForm" class="btn btn-outline" type="button">清空</button></div></form></div>
+        <div class="panel"><div class="table-wrap"><table id="readerTable"></table></div></div>
+      </div>
 
-        <article class="panel">
-          <div class="panel-title"><h3>图书列表</h3><span id="bookTotalText"></span></div>
-          <div class="table-wrap"><table id="bookTable"></table></div>
-          <div class="pager"><button id="bookPrev">上一页</button><span id="bookPageText"></span><button id="bookNext">下一页</button></div>
-        </article>
-      </section>
+      <div id="records" class="view">
+        <div class="panel"><div class="panel-title"><h3>借书登记</h3><span>库存自动扣减</span></div><form id="borrowForm" class="form-grid grid-4"><label>图书 <select id="borrowBook" required class="input"></select></label><label class="admin-only">读者 <select id="borrowReader" class="input"></select></label><label>借阅天数 <input id="borrowDays" type="number" value="30" min="1" max="180" required /></label><label>备注 <input id="borrowRemark" placeholder="可选" /></label><div class="form-actions"><button class="btn btn-primary" type="submit">确认借书</button></div></form></div>
+        <div class="panel"><div class="panel-title"><h3>借还记录</h3><span>分页查询 + 状态筛选</span></div><div class="toolbar"><input id="recordKeyword" placeholder="书名/读者/ISBN" class="input" /><select id="recordStatus" class="input"><option value="">全部状态</option><option value="borrowed">借阅中</option><option value="overdue">已逾期</option><option value="returned">已归还</option></select><button id="recordSearchBtn" class="btn btn-primary">查询</button><button id="exportRecordsBtn" class="btn btn-outline">导出 CSV</button></div><div class="table-wrap"><table id="recordTable"></table></div><div class="pager"><button id="recordPrev" class="btn btn-outline-sm">上一页</button><span id="recordPageText"></span><button id="recordNext" class="btn btn-outline-sm">下一页</button></div></div>
+      </div>
 
-      <section id="readers" class="view">
-        <article class="panel">
-          <div class="panel-title"><h3>读者信息管理</h3><span>仅管理员可见</span></div>
-          <div class="toolbar">
-            <input id="readerSearch" placeholder="姓名 / 用户名 / 手机 / 邮箱 / 院系" />
-            <button id="readerSearchBtn" class="primary">查询</button>
-          </div>
-          <form id="readerForm" class="form-grid grid-4">
-            <input type="hidden" id="readerId" />
-            <label>用户名<input id="readerUsername" required /></label>
-            <label>密码<input id="readerPassword" type="password" placeholder="新增必填，编辑留空不改" /></label>
-            <label>姓名<input id="readerFullName" required /></label>
-            <label>状态<select id="readerStatus"><option value="active">正常</option><option value="frozen">冻结</option></select></label>
-            <label>手机<input id="readerPhone" /></label>
-            <label>邮箱<input id="readerEmail" /></label>
-            <label class="span-2">院系/单位<input id="readerDepartment" /></label>
-            <button class="primary" type="submit">保存读者</button>
-            <button id="resetReaderForm" class="ghost" type="button">清空</button>
-          </form>
-        </article>
-        <article class="panel"><div class="table-wrap"><table id="readerTable"></table></div></article>
-      </section>
-
-      <section id="records" class="view">
-        <article class="panel">
-          <div class="panel-title"><h3>借书登记</h3><span>库存自动扣减，归还自动恢复</span></div>
-          <form id="borrowForm" class="form-grid grid-4">
-            <label>图书<select id="borrowBook" required></select></label>
-            <label class="admin-only">读者<select id="borrowReader"></select></label>
-            <label>借阅天数<input id="borrowDays" type="number" value="30" min="1" max="180" required /></label>
-            <label>备注<input id="borrowRemark" placeholder="可选" /></label>
-            <button class="primary" type="submit">确认借书</button>
-          </form>
-        </article>
-        <article class="panel">
-          <div class="panel-title"><h3>借还记录</h3><span>分页查询 + 状态筛选</span></div>
-          <div class="toolbar">
-            <input id="recordKeyword" placeholder="书名 / 读者 / ISBN" />
-            <select id="recordStatus"><option value="">全部状态</option><option value="borrowed">借阅中</option><option value="overdue">已逾期</option><option value="returned">已归还</option></select>
-            <button id="recordSearchBtn" class="primary">查询</button>
-            <button id="exportRecordsBtn" class="ghost">导出 CSV</button>
-          </div>
-          <div class="table-wrap"><table id="recordTable"></table></div>
-          <div class="pager"><button id="recordPrev">上一页</button><span id="recordPageText"></span><button id="recordNext">下一页</button></div>
-        </article>
-      </section>
-
-      <section id="overdue" class="view">
-        <article class="panel">
-          <div class="panel-title"><h3>逾期提醒中心</h3><span>自动扫描逾期记录并生成提醒消息</span></div>
-          <div class="toolbar">
-            <button id="refreshOverdueBtn" class="primary">刷新逾期列表</button>
-            <button id="generateRemindersBtn" class="danger">生成提醒消息</button>
-          </div>
-          <div id="reminderMessages" class="reminder-box"></div>
-          <div class="table-wrap"><table id="overdueTable"></table></div>
-        </article>
-      </section>
+      <div id="overdue" class="view">
+        <div class="panel"><div class="panel-title"><h3>逾期提醒中心</h3><span>自动扫描并生成提醒</span></div><div class="toolbar"><button id="refreshOverdueBtn" class="btn btn-primary">刷新逾期列表</button><button id="generateRemindersBtn" class="btn btn-outline">生成提醒消息</button></div><div id="reminderMessages" class="reminder-box"></div><div class="table-wrap"><table id="overdueTable"></table></div></div>
+      </div>
     </section>
   </div>
 
