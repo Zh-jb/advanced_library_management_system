@@ -811,5 +811,165 @@ $('auditPrev').addEventListener('click', () => { if (state.auditPage > 1) { stat
 $('auditNext').addEventListener('click', () => { state.auditPage++; loadAuditLogs(); });
 $('exportAuditBtn').addEventListener('click', exportAuditLogs);
 
+// 登录注册相关函数
+function showLoginPage() {
+  $('loginCard').classList.remove('hidden');
+  $('registerCard').classList.add('hidden');
+  $('forgotPasswordCard').classList.add('hidden');
+}
+
+function showRegisterPage() {
+  $('loginCard').classList.add('hidden');
+  $('registerCard').classList.remove('hidden');
+  $('forgotPasswordCard').classList.add('hidden');
+}
+
+function showForgotPasswordPage() {
+  $('loginCard').classList.add('hidden');
+  $('registerCard').classList.add('hidden');
+  $('forgotPasswordCard').classList.remove('hidden');
+}
+
+function startCodeTimer(btnId, seconds = 60) {
+  const btn = $(btnId);
+  let count = seconds;
+  btn.disabled = true;
+  btn.textContent = `${count}秒后重发`;
+  const timer = setInterval(() => {
+    count--;
+    if (count <= 0) {
+      clearInterval(timer);
+      btn.disabled = false;
+      btn.textContent = '发送验证码';
+    } else {
+      btn.textContent = `${count}秒后重发`;
+    }
+  }, 1000);
+}
+
+async function sendRegisterCode() {
+  const phone = $('registerPhone').value;
+  if (!phone) return toast('请输入手机号', 'error');
+  try {
+    await api('/api/auth/send-code', { method: 'POST', body: JSON.stringify({ phone }) });
+    toast('验证码已发送（开发模式：验证码为 123456）', 'success');
+    startCodeTimer('sendRegisterCodeBtn');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+async function sendForgotCode() {
+  const phone = $('forgotPhone').value;
+  if (!phone) return toast('请输入手机号', 'error');
+  try {
+    await api('/api/auth/send-forgot-code', { method: 'POST', body: JSON.stringify({ phone }) });
+    toast('验证码已发送（开发模式：验证码为 123456）', 'success');
+    startCodeTimer('sendForgotCodeBtn');
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+async function handleRegister(e) {
+  e.preventDefault();
+  const username = $('registerUsername').value;
+  const phone = $('registerPhone').value;
+  const code = $('registerCode').value;
+  const password = $('registerPassword').value;
+  
+  if (!username || !phone || !code || !password) {
+    return toast('请填写完整信息', 'error');
+  }
+  if (password.length < 6) {
+    return toast('密码至少6位', 'error');
+  }
+  
+  try {
+    await api('/api/auth/register', { 
+      method: 'POST', 
+      body: JSON.stringify({ username, phone, code, password }) 
+    });
+    toast('注册成功，请登录', 'success');
+    showLoginPage();
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+async function handleForgotPassword(e) {
+  e.preventDefault();
+  const phone = $('forgotPhone').value;
+  const code = $('forgotCode').value;
+  const newPassword = $('forgotNewPassword').value;
+  
+  if (!phone || !code || !newPassword) {
+    return toast('请填写完整信息', 'error');
+  }
+  if (newPassword.length < 6) {
+    return toast('密码至少6位', 'error');
+  }
+  
+  try {
+    await api('/api/auth/forgot-password', { 
+      method: 'POST', 
+      body: JSON.stringify({ phone, code, new_password: newPassword }) 
+    });
+    toast('密码重置成功，请登录', 'success');
+    showLoginPage();
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+function showChangePasswordModal() {
+  $('changePasswordModal').classList.remove('hidden');
+}
+
+function closeChangePasswordModal() {
+  $('changePasswordModal').classList.add('hidden');
+  $('oldPassword').value = '';
+  $('newPassword').value = '';
+  $('confirmNewPassword').value = '';
+}
+
+async function confirmChangePassword() {
+  const oldPassword = $('oldPassword').value;
+  const newPassword = $('newPassword').value;
+  const confirmPassword = $('confirmNewPassword').value;
+  
+  if (!oldPassword || !newPassword || !confirmPassword) {
+    return toast('请填写完整信息', 'error');
+  }
+  if (newPassword.length < 6) {
+    return toast('新密码至少6位', 'error');
+  }
+  if (newPassword !== confirmPassword) {
+    return toast('两次输入的密码不一致', 'error');
+  }
+  
+  try {
+    await api('/api/auth/change-password', { 
+      method: 'POST', 
+      body: JSON.stringify({ old_password: oldPassword, new_password: newPassword }) 
+    });
+    toast('密码修改成功', 'success');
+    closeChangePasswordModal();
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+// 登录注册事件绑定
+$('registerLink').addEventListener('click', showRegisterPage);
+$('forgotPasswordLink').addEventListener('click', showForgotPasswordPage);
+$('backToLoginFromRegister').addEventListener('click', showLoginPage);
+$('backToLoginFromForgot').addEventListener('click', showLoginPage);
+$('sendRegisterCodeBtn').addEventListener('click', sendRegisterCode);
+$('sendForgotCodeBtn').addEventListener('click', sendForgotCode);
+$('registerForm').addEventListener('submit', handleRegister);
+$('forgotPasswordForm').addEventListener('submit', handleForgotPassword);
+$('changePasswordBtn').addEventListener('click', showChangePasswordModal);
+
 // Initialize on page load
 window.addEventListener('DOMContentLoaded', initAuth);

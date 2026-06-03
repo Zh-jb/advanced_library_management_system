@@ -29,6 +29,423 @@ body {
   letter-spacing: 0.01em;
   position: relative;
 }
+<<<<<<< HEAD
+
+.hidden { display: none !important; }
+
+/* --- 登录页 --- */
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.login-card {
+  width: min(420px, 100%);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding: 40px;
+  border-radius: var(--radius-bento);
+  box-shadow: var(--shadow-glass);
+  border: 1px solid var(--glass-border);
+  text-align: center;
+}
+.brand-mark {
+  width: 56px; height: 56px;
+  margin: 0 auto 20px;
+  display: grid; place-items: center;
+  border-radius: 18px;
+  background: var(--primary);
+  color: white; font-size: 28px; font-weight: 800;
+}
+.brand-mark.small { width: 40px; height: 40px; border-radius: 12px; font-size: 20px; margin: 0; }
+.login-card h1 { margin: 0 0 10px; font-size: 24px; color: #334155; }
+.login-card p { color: var(--text-muted); font-size: 14px; margin-bottom: 24px; }
+.demo-account { margin-top: 20px; font-size: 13px; color: var(--text-muted); }
+
+/* --- 主体框架 (Bento 结构) --- */
+.app-shell { display: flex; gap: var(--gap-bento); padding: var(--gap-bento); min-height: 100vh; }
+
+.sidebar {
+  width: 260px;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-bento);
+  padding: 24px 16px;
+  box-shadow: var(--shadow-glass);
+  display: flex; flex-direction: column; gap: 8px;
+  position: sticky; top: var(--gap-bento); height: calc(100vh - var(--gap-bento) * 2);
+}
+.side-brand { display: flex; align-items: center; gap: 12px; padding: 0 8px 20px; color: #334155;}
+.side-brand strong { font-size: 18px; }
+.side-brand span { display: block; color: var(--text-muted); font-size: 12px; }
+
+.nav {
+  display: block; width: 100%;
+  color: var(--text-main); background: transparent; border: 0;
+  padding: 14px 18px; text-align: left;
+  border-radius: 16px; cursor: pointer; font-size: 15px; font-weight: 500;
+  transition: all 0.2s ease;
+}
+.nav:hover { background: rgba(255, 255, 255, 0.4); }
+.nav.active { background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.03); color: var(--primary-dark); font-weight: 600; }
+
+.workspace { flex: 1; display: flex; flex-direction: column; gap: var(--gap-bento); min-width: 0; }
+
+/* --- 顶部导航 --- */
+.topbar {
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-bento);
+  padding: 20px 28px;
+  box-shadow: var(--shadow-glass);
+}
+.topbar h2 { margin: 0 0 4px; font-size: 22px; color: #334155; }
+.topbar p { margin: 0; color: var(--text-muted); font-size: 13px; }
+.user-box { display: flex; gap: 16px; align-items: center; font-size: 14px; font-weight: 500; }
+
+.view { display: none; }
+.active-view { display: grid; gap: var(--gap-bento); } /* 餐盒布局核心 */
+
+/* --- 毛玻璃面板 (Bento 卡片) --- */
+.panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-bento);
+  padding: 28px;
+  box-shadow: var(--shadow-glass);
+}
+.panel-title { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 20px; }
+.panel-title h3 { margin: 0; font-size: 18px; color: #334155; }
+.panel-title span { color: var(--text-muted); font-size: 13px; }
+
+/* --- 网格系统 --- */
+.metric-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--gap-bento); }
+.metric-card {
+  background: rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px; padding: 20px;
+}
+.metric-card span { color: var(--text-muted); font-size: 13px; font-weight: 500; }
+.metric-card strong { display: block; font-size: 32px; margin-top: 10px; color: #334155; }
+
+/* --- 图表网格容器 --- */
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--gap-bento);
+  width: 100%;
+  min-width: 0; /* 防止整体容器被内部子元素撑破 */
+}
+
+/* 关键修复：允许 Panel 在 Grid 布局中向内收缩 */
+.chart-grid .panel {
+  min-width: 0; /* 这是解决溢出问题的核心，打破 Grid 默认的最小内容宽度限制 */
+  width: 100%;
+  overflow: hidden; /* 隐藏任何可能越界的绘制边缘 */
+}
+
+/* --- Canvas 强制响应式缩放 --- */
+canvas {
+  width: 100% !important;     /* 强制宽度跟随父元素 (.panel) */
+  max-width: 100%;
+  height: auto !important;    /* 高度按比例自动缩放，防止变形 */
+  max-height: 220px;          /* 封顶高度，对齐你原始代码的 220px 预期 */
+  display: block;             /* 消除 Canvas 底部的幽灵空白间距 */
+  margin: 0 auto;
+}
+
+/* --- 表单与控件 --- */
+.toolbar { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+input, select {
+  width: 100%; border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 14px; padding: 12px 16px; outline: none;
+  background: rgba(255, 255, 255, 0.7); color: var(--text-main);
+  transition: all 0.2s;
+}
+input:focus, select:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 3px rgba(107, 142, 165, 0.15); }
+.toolbar input { max-width: 320px; }
+.toolbar select { max-width: 160px; }
+
+button {
+  border: 0; border-radius: 14px; padding: 12px 20px;
+  cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s;
+}
+button.primary { background: var(--primary); color: white; }
+button.primary:hover { background: var(--primary-dark); transform: translateY(-1px); }
+button.ghost { background: rgba(255, 255, 255, 0.6); color: var(--text-main); border: 1px solid var(--glass-border); }
+button.ghost:hover { background: white; }
+button.danger { background: var(--danger); color: white; }
+button.full { width: 100%; }
+
+.form-grid { display: grid; gap: 16px; }
+.grid-4 { grid-template-columns: repeat(4, 1fr); align-items: end; }
+.form-grid label { display: grid; gap: 8px; font-size: 13px; font-weight: 500; }
+.span-2 { grid-column: span 2; }
+.span-4 { grid-column: span 4; }
+
+/* --- 表格设计 --- */
+.table-wrap { width: 100%; overflow-x: auto; border-radius: 16px; }
+table { width: 100%; border-collapse: collapse; min-width: 860px; }
+th, td { padding: 14px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.5); text-align: left; }
+th { color: var(--text-muted); font-size: 13px; font-weight: 600; background: rgba(255, 255, 255, 0.3); }
+td { font-size: 14px; }
+tr:hover td { background: rgba(255, 255, 255, 0.4); }
+
+/* --- 徽章 --- */
+.badge { display: inline-block; padding: 6px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; }
+.badge.borrowed { background: rgba(107, 142, 165, 0.2); color: var(--primary-dark); }
+.badge.returned { background: rgba(158, 187, 161, 0.2); color: var(--success); }
+.badge.overdue { background: rgba(204, 163, 163, 0.2); color: var(--danger); }
+
+.row-actions { display: flex; gap: 8px; }
+.row-actions button { padding: 6px 12px; font-size: 12px; border-radius: 10px; }
+
+.report-preview { padding: 20px; background: rgba(255, 255, 255, 0.16); border-radius: 18px; }
+.report-summary { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; margin-bottom: 20px; }
+.report-summary div { padding: 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.35); color: #1f2937; }
+
+/* --- 列表与杂项 --- */
+.pager { display: flex; justify-content: flex-end; align-items: center; gap: 12px; margin-top: 20px; font-size: 13px; }
+.top-list { display: grid; gap: 12px; }
+.top-item {
+  display: grid; grid-template-columns: 44px 1fr auto; gap: 16px; align-items: center;
+  padding: 12px 16px; border-radius: 18px; background: rgba(255, 255, 255, 0.4);
+}
+.top-item .rank { width: 34px; height: 34px; display: grid; place-items: center; border-radius: 12px; background: var(--primary); color: white; font-weight: 700; }
+.reminder-msg { padding: 14px 18px; background: rgba(204, 163, 163, 0.15); color: #9c6060; border-radius: 16px; margin-bottom: 12px;}
+
+/* --- 智能推荐模块样式 --- */
+.recommendations {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.recommendation-section {
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 16px;
+  padding: 20px;
+}
+
+.recommendation-section h4 {
+  margin: 0 0 16px;
+  font-size: 15px;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.recommendation-section h4 .icon {
+  font-size: 18px;
+}
+
+.rec-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.rec-item {
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+.rec-item strong {
+  display: block;
+  color: #334155;
+  margin-bottom: 4px;
+}
+
+/* --- 导入功能样式 --- */
+.import-label {
+  cursor: pointer;
+}
+
+.import-result {
+  margin-top: 16px;
+}
+
+.import-result.hidden {
+  display: none;
+}
+
+/* --- 公告状态徽章 --- */
+.badge.published {
+  background: rgba(158, 187, 161, 0.2);
+  color: #15803d;
+}
+
+.badge.draft {
+  background: rgba(148, 163, 184, 0.2);
+  color: #475569;
+}
+
+/* --- 登录相关样式 --- */
+.login-links {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: var(--primary);
+  font-size: 14px;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.link-btn:hover {
+  color: var(--primary-dark);
+  transform: none;
+}
+
+.code-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+  align-items: end;
+}
+
+.code-btn {
+  white-space: nowrap;
+}
+
+/* --- 模态框样式 --- */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 24px;
+  width: min(420px, 90%);
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  color: #334155;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+}
+
+.close-btn:hover {
+  color: var(--text-main);
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.modal-body label {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.modal-body label:last-child {
+  margin-bottom: 0;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px 24px;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  background: rgba(248, 250, 252, 1);
+}
+
+.badge.archived {
+  background: rgba(212, 181, 142, 0.2);
+  color: #92400e;
+}
+
+/* --- 操作日志样式 --- */
+.badge.LOGIN {
+  background: rgba(59, 130, 246, 0.2);
+  color: #1d4ed8;
+}
+
+.badge.CREATE {
+  background: rgba(34, 197, 94, 0.2);
+  color: #166534;
+}
+
+.badge.UPDATE {
+  background: rgba(234, 179, 8, 0.2);
+  color: #92400e;
+}
+
+.badge.DELETE {
+  background: rgba(239, 68, 68, 0.2);
+  color: #991b1b;
+}
+
+.badge.BORROW {
+  background: rgba(139, 92, 246, 0.2);
+  color: #6d28d9;
+}
+
+.badge.RETURN {
+  background: rgba(16, 185, 129, 0.2);
+  color: #14532d;
+}
+
+.badge.RESET_PASSWORD {
+  background: rgba(249, 115, 22, 0.2);
+  color: #9a3412;
+}
+
 body::before {
   content: '';
   position: fixed;
