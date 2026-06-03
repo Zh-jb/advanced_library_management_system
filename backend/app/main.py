@@ -8,7 +8,19 @@ from fastapi.staticfiles import StaticFiles
 
 from .config import APP_NAME, APP_VERSION, FRONTEND_DIR
 from .database import db_manager
-from .schemas import BookCreate, BookUpdate, BorrowCreate, LoginRequest, ReaderCreate, ReaderUpdate
+from .auth_service import auth_service
+from .schemas import (
+    BookCreate,
+    BookUpdate,
+    BorrowCreate,
+    ChangePasswordRequest,
+    ForgotPasswordRequest,
+    LoginRequest,
+    ReaderCreate,
+    ReaderUpdate,
+    RegisterRequest,
+    VerifyCodeRequest,
+)
 from .security import create_token, verify_password, verify_token
 from .services import book_service, borrow_service, export_service, reader_service, report_service, stats_service
 
@@ -74,6 +86,33 @@ def login(data: LoginRequest):
 @app.get("/api/auth/me")
 def me(current_user: Dict[str, Any] = Depends(get_current_user)):
     return current_user
+
+
+@app.post("/api/auth/send-code")
+def send_verify_code(data: VerifyCodeRequest):
+    return auth_service.send_verify_code(data.phone, "register")
+
+
+@app.post("/api/auth/send-forgot-code")
+def send_forgot_code(data: VerifyCodeRequest):
+    return auth_service.send_verify_code(data.phone, "forgot_password")
+
+
+@app.post("/api/auth/register")
+def register(data: RegisterRequest):
+    user = auth_service.register(data.dict())
+    token = create_token(user)
+    return {"token": token, "user": user}
+
+
+@app.post("/api/auth/forgot-password")
+def forgot_password(data: ForgotPasswordRequest):
+    return auth_service.forgot_password(data.phone, data.verify_code, data.new_password)
+
+
+@app.post("/api/auth/change-password")
+def change_password(data: ChangePasswordRequest, current_user: Dict[str, Any] = Depends(get_current_user)):
+    return auth_service.change_password(current_user["id"], data.old_password, data.new_password)
 
 
 @app.get("/api/books")
