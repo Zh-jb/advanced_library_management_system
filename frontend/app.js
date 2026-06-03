@@ -121,48 +121,147 @@ async function loadDashboard() {
   `).join('') : '<p>暂无借阅数据</p>';
 }
 
+// ========== 饼图（糖果色，无 hover 高亮） ==========
 function drawPie(canvasId, items) {
-  const canvas = $(canvasId);
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  const w = canvas.width = canvas.clientWidth * devicePixelRatio;
-  const h = canvas.height = 220 * devicePixelRatio;
-  ctx.clearRect(0, 0, w, h);
+  const dpr = window.devicePixelRatio || 1;
+  const width = canvas.clientWidth;
+  const height = 220;
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
+  ctx.scale(dpr, dpr);
+
   const total = items.reduce((sum, x) => sum + Number(x.value), 0) || 1;
+  if (total === 0) {
+    ctx.fillStyle = '#999';
+    ctx.font = '14px "Source Sans 3", sans-serif';
+    ctx.fillText('暂无数据', width/2-30, height/2);
+    return;
+  }
+
+  // 按数值从大到小排序，使颜色分配更有层次
+  const sortedItems = [...items].sort((a, b) => Number(b.value) - Number(a.value));
+  const candyColors = ['#FF6B6B', '#FFB347', '#FFD966', '#A2E1B0', '#77C3F2', '#D9A5E6', '#F5A3C7', '#BCE5FF', '#C9E4DE', '#FADADD'];
+  const colors = sortedItems.map((_, idx) => candyColors[idx % candyColors.length]);
+
+  const cx = 110, cy = height / 2, r = 70;
   let start = -Math.PI / 2;
-  const colors = ['#6b8ea5', '#9ebba1', '#d4b58e', '#cca3a3', '#8b849c', '#7ba1a0', '#c296a1', '#b2bba1', '#98849c', '#d69e85'];
-  const cx = 120 * devicePixelRatio, cy = 110 * devicePixelRatio, r = 76 * devicePixelRatio;
-  items.forEach((item, i) => {
-    const angle = (Number(item.value) / total) * Math.PI * 2;
-    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, start, start + angle); ctx.closePath();
-    ctx.fillStyle = colors[i % colors.length]; ctx.fill(); start += angle;
-  });
-  ctx.fillStyle = '#182235'; ctx.font = `${13 * devicePixelRatio}px Microsoft YaHei`;
-  items.slice(0, 8).forEach((item, i) => {
-    const x = 230 * devicePixelRatio, y = (34 + i * 22) * devicePixelRatio;
-    ctx.fillStyle = colors[i % colors.length]; ctx.fillRect(x, y - 10 * devicePixelRatio, 12 * devicePixelRatio, 12 * devicePixelRatio);
-    ctx.fillStyle = '#334155'; ctx.fillText(`${item.name}：${item.value}`, x + 20 * devicePixelRatio, y);
-  });
+  for (let i = 0; i < sortedItems.length; i++) {
+    const angle = (Number(sortedItems[i].value) / total) * Math.PI * 2;
+    const end = start + angle;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, start, end);
+    ctx.closePath();
+    ctx.fillStyle = colors[i];
+    ctx.fill();
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+    start = end;
+  }
+
+  // 中心白点
+  ctx.beginPath();
+  ctx.arc(cx, cy, 10, 0, Math.PI * 2);
+  ctx.fillStyle = '#FFFFFF';
+  ctx.fill();
+  ctx.strokeStyle = '#DDDDDD';
+  ctx.lineWidth = 1.2;
+  ctx.stroke();
+
+  // 右侧图例
+  const legendX = cx + r + 15;
+  const legendStartY = cy - (sortedItems.length * 18) / 2;
+  ctx.font = '11px "Source Sans 3", sans-serif';
+  for (let i = 0; i < sortedItems.length; i++) {
+    const item = sortedItems[i];
+    const y = legendStartY + i * 20;
+    ctx.fillStyle = colors[i];
+    ctx.fillRect(legendX, y, 12, 12);
+    ctx.fillStyle = '#666666';
+    ctx.fillText(`${item.name}: ${item.value}`, legendX + 18, y + 10);
+  }
 }
 
+// ========== 柱状图（淡黄色，无 hover 高亮） ==========
 function drawBar(canvasId, items) {
-  const canvas = $(canvasId);
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  const w = canvas.width = canvas.clientWidth * devicePixelRatio;
-  const h = canvas.height = 220 * devicePixelRatio;
-  ctx.clearRect(0, 0, w, h);
-  const pad = 34 * devicePixelRatio;
+  const dpr = window.devicePixelRatio || 1;
+  const width = canvas.clientWidth;
+  const height = 220;
+  canvas.width = width * dpr;
+  canvas.height = height * dpr;
+  ctx.scale(dpr, dpr);
+
+  if (!items.length) {
+    ctx.fillStyle = '#999';
+    ctx.font = '14px "Source Sans 3", sans-serif';
+    ctx.fillText('暂无借阅数据', width/2-70, height/2);
+    return;
+  }
+
+  const pad = { left: 45, right: 20, top: 20, bottom: 30 };
+  const graphW = width - pad.left - pad.right;
+  const graphH = height - pad.top - pad.bottom;
   const max = Math.max(1, ...items.map(x => Number(x.count)));
-  const gap = 8 * devicePixelRatio;
-  const barW = (w - pad * 2 - gap * (items.length - 1)) / items.length;
-  ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1;
-  ctx.beginPath(); ctx.moveTo(pad, h - pad); ctx.lineTo(w - pad, h - pad); ctx.stroke();
-  items.forEach((item, i) => {
-    const bh = (Number(item.count) / max) * (h - pad * 2);
-    const x = pad + i * (barW + gap), y = h - pad - bh;
-    ctx.fillStyle = '#2563eb'; ctx.fillRect(x, y, barW, bh || 2 * devicePixelRatio);
-    ctx.fillStyle = '#64748b'; ctx.font = `${10 * devicePixelRatio}px Microsoft YaHei`;
-    if (i % 2 === 0) ctx.fillText(item.day, x - 2 * devicePixelRatio, h - 10 * devicePixelRatio);
-  });
+  const gap = 10;
+  const barW = (graphW - gap * (items.length - 1)) / items.length;
+  const barColor = '#FFD966';
+
+  // 虚线网格
+  ctx.save();
+  ctx.strokeStyle = '#E0E0E0';
+  ctx.lineWidth = 1;
+  ctx.setLineDash([5, 5]);
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + (graphH / 4) * i;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, y);
+    ctx.lineTo(width - pad.right, y);
+    ctx.stroke();
+    ctx.fillStyle = '#888888';
+    ctx.font = '10px "Source Sans 3", sans-serif';
+    ctx.fillText(Math.round(max * (1 - i/4)), pad.left - 18, y + 4);
+  }
+  ctx.setLineDash([]);
+
+  let maxCount = -Infinity, maxIndex = -1;
+  for (let i = 0; i < items.length; i++) {
+    const count = Number(items[i].count);
+    if (count > maxCount) { maxCount = count; maxIndex = i; }
+    const barH = (count / max) * graphH;
+    const x = pad.left + i * (barW + gap);
+    const y = pad.top + graphH - barH;
+    ctx.fillStyle = barColor;
+    ctx.fillRect(x, y, barW, Math.max(barH, 2));
+    ctx.strokeStyle = '#FFFFFF';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(x, y, barW, Math.max(barH, 2));
+
+    // X轴日期
+    ctx.fillStyle = '#666666';
+    ctx.font = '10px "Source Sans 3", sans-serif';
+    let label = items[i].day;
+    if (label.length > 5) label = label.slice(5);
+    ctx.fillText(label, x + barW/2 - 12, height - pad.bottom + 10);
+  }
+
+  // 最高柱子数值标签
+  if (maxIndex !== -1) {
+    const count = Number(items[maxIndex].count);
+    const barH = (count / max) * graphH;
+    const x = pad.left + maxIndex * (barW + gap);
+    const y = pad.top + graphH - barH;
+    ctx.fillStyle = '#E6B800';
+    ctx.font = 'bold 11px "Source Sans 3", sans-serif';
+    ctx.fillText(count, x + barW/2 - 6, y - 6);
+  }
+  ctx.restore();
 }
 
 async function loadBooks() {
